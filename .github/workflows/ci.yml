@@ -11,5 +11,5 @@ jobs:
         with:
           node-version: 24
       - run: npm ci
-      - run: npx playwright install chrome
+      # Google Chrome comes installed on GitHub's runners.
       - run: npm test
