@@ -13,8 +13,14 @@
     return;
   }
 
+  // Clarity's own queue: calls made before Clarity loads (here or by the site) wait for it.
+  window.clarity =
+    window.clarity ||
+    function () {
+      (window.clarity.q = window.clarity.q || []).push(arguments);
+    };
   function clarity() {
-    if (typeof window.clarity === 'function') window.clarity.apply(window, arguments);
+    window.clarity.apply(window, arguments);
   }
 
   /** One step of one form, with the page it happened on. */
@@ -29,11 +35,10 @@
 
   // Clarity itself, when the site does not load it: no cookies until the banner says yes.
   if (settings.clarity) {
-    (function (c, l, a, r, i, t, y) {
-      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
-      t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
-      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-    })(window, document, 'clarity', 'script', settings.clarity);
+    var tag = document.createElement('script');
+    tag.async = true;
+    tag.src = 'https://www.clarity.ms/tag/' + settings.clarity;
+    document.head.appendChild(tag);
     consent(false);
   }
 
@@ -54,7 +59,8 @@
         consent(accepted.indexOf('analytics') > -1);
       });
       if (typeof window.getCkyConsent === 'function') {
-        consent(!!window.getCkyConsent().categories.analytics);
+        var given = window.getCkyConsent() || {};
+        consent(!!(given.categories && given.categories.analytics));
       }
     },
   };
@@ -71,7 +77,20 @@
     });
   }
 
+  /** Whether a selector is valid CSS; a wrong one is named in the console and its form skipped. */
+  function valid(selector) {
+    try {
+      document.createDocumentFragment().querySelector(selector);
+      return true;
+    } catch (error) {
+      console.warn('kowboy-conversions: "' + selector + '" is not a valid CSS selector; that form is not counted.');
+      return false;
+    }
+  }
+
   settings.forms.forEach(function (form) {
+    var selectors = [form.form, form.open, form.submit && form.submit.shown].filter(Boolean);
+    if (!selectors.every(valid)) return;
     var started = false;
     if (form.open) {
       window.addEventListener('click', function (event) {
@@ -101,7 +120,12 @@
         var now = !!(element && element.getClientRects().length);
         if (now && !shown) submitted();
         shown = now;
-      }).observe(document.documentElement, { childList: true, subtree: true, attributes: true });
+      }).observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class', 'style', 'hidden'],
+      });
     }
   });
 })();

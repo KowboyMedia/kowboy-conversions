@@ -29,6 +29,8 @@ form steps, never what visitors type.
 5. Cookiebot statistics consent becomes Clarity analytics consent.
 6. CookieYes analytics consent becomes Clarity analytics consent.
 7. Without settings nothing is counted and the console says why.
+8. Calls made before the site loads Clarity wait in its queue.
+9. A form with a wrong selector is skipped and named, the others still count.
 
 ## Out of scope
 

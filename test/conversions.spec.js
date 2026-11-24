@@ -102,3 +102,25 @@ test('AC7: without settings nothing is counted and the console says why', async 
   expect(warnings.join()).toContain('window.kowboyConversions.forms is missing');
   expect(await calls(page)).toEqual([]);
 });
+
+test('AC8: calls made before the site loads Clarity wait in its queue', async ({ page }) => {
+  await open(page, { body: form, settings: { forms: [{ name: 'valuation', form: '#lead', submit: { event: 'sent' } }] } });
+  await page.fill('[name=name]', 'A');
+  expect(await page.evaluate(() => window.clarity.q.map((c) => [...c]))).toEqual([
+    ['set', 'valuation_form_page', '/salj/'],
+    ['event', 'valuation_form_start'],
+  ]);
+});
+
+test('AC9: a form with a wrong selector is skipped and named, the others still count', async ({ page }) => {
+  const warnings = [];
+  page.on('console', (m) => m.type() === 'warning' && warnings.push(m.text()));
+  await open(page, {
+    body: form,
+    before: recorder,
+    settings: { forms: [{ name: 'broken', form: '#lead[' }, { name: 'valuation', form: '#lead' }] },
+  });
+  await page.fill('[name=name]', 'A');
+  expect(warnings.join()).toContain('"#lead[" is not a valid CSS selector');
+  expect(await events(page)).toEqual(['valuation_form_start']);
+});
