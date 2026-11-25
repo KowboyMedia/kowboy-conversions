@@ -19,22 +19,23 @@ Before `</head>` (or as one Custom HTML tag in the site's Tag Manager):
 <script data-cookieconsent="ignore">
   window.kowboyConversions = {
     clarity: 'PROJECT_ID', // leave out when the site already loads Clarity
-    consent: 'cookiebot', // or 'cookieyes'; leave out to run Clarity without cookies
+    consent: 'cookiebot', // or 'cookieyes': Clarity loads only after its yes to statistics
     forms: [
       { name: 'valuation', open: '.valuation-button', form: '#valuation-form', submit: { event: 'wpcf7mailsent' } },
       { name: 'contact', form: '#contact-form', submit: { shown: '.contact-thanks' } },
     ],
   };
 </script>
-<script data-cookieconsent="ignore" defer src="https://cdn.jsdelivr.net/gh/KowboyMedia/kowboy-conversions@1/kowboy-conversions.js"></script>
+<script data-cookieconsent="ignore" defer src="https://cdn.jsdelivr.net/gh/KowboyMedia/kowboy-conversions@2/kowboy-conversions.js"></script>
 ```
 
 - `form`: a CSS selector for the form (inside an open shadow root works too).
 - `submit`: either `event`, a DOM event the site fires on success (Contact Form 7: `wpcf7mailsent`),
   or `shown`, a selector for the confirmation that becomes visible.
-- The script sets no cookies itself. Clarity runs without cookies until the banner gives
-  statistics/analytics consent; turn off Cookies in the Clarity project's Settings, Setup, for a
-  site with no banner.
+- The script sets no cookies and sends nothing itself. Clarity is loaded only after the site's
+  cookie banner gets the visitor's yes to statistics: tracking by script needs consent even
+  without cookies (EDPB guidelines 2/2023, 2024). A site without a banner gets no Clarity.
+  Until the yes, the form events wait in the page.
 
 ## Read the numbers in Clarity
 

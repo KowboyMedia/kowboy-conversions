@@ -2,7 +2,7 @@
 
 ## Where to pick up (2026-11-24)
 
-The script and its tests are done and tagged `v1.0.0`. Next: install it on the first client site,
+The script and its tests are done and tagged `v2.0.0` (Clarity only after the banner's yes). Next: install it on the first client site,
 which waits on questions 1 to 3.
 
 1. `[conversions]` Per site (the site list is in the ClickUp task "Track conversions", not here):

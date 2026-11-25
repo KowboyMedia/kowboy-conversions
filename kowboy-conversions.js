@@ -29,17 +29,20 @@
     clarity('event', name + '_form_' + step);
   }
 
+  // Clarity itself, when the site does not load it: only after the banner's yes, since tracking
+  // by script needs consent even without cookies (EDPB guidelines 2/2023).
+  var loaded = false;
   function consent(granted) {
-    clarity('consentv2', { ad_Storage: 'denied', analytics_Storage: granted ? 'granted' : 'denied' });
-  }
-
-  // Clarity itself, when the site does not load it: no cookies until the banner says yes.
-  if (settings.clarity) {
-    var tag = document.createElement('script');
-    tag.async = true;
-    tag.src = 'https://www.clarity.ms/tag/' + settings.clarity;
-    document.head.appendChild(tag);
-    consent(false);
+    if (granted && settings.clarity && !loaded) {
+      loaded = true;
+      var tag = document.createElement('script');
+      tag.async = true;
+      tag.src = 'https://www.clarity.ms/tag/' + settings.clarity;
+      document.head.appendChild(tag);
+    }
+    if (loaded || !settings.clarity) {
+      clarity('consentv2', { ad_Storage: 'denied', analytics_Storage: granted ? 'granted' : 'denied' });
+    }
   }
 
   // The site's cookie banner: its statistics or analytics answer becomes Clarity's consent.
@@ -68,6 +71,8 @@
     console.warn('kowboy-conversions: consent "' + settings.consent + '" is unknown; use cookiebot or cookieyes.');
   } else if (settings.consent) {
     banners[settings.consent]();
+  } else if (settings.clarity) {
+    console.warn('kowboy-conversions: Clarity needs the cookie banner\'s yes; set consent to cookiebot or cookieyes.');
   }
 
   /** Whether the event passed through an element the selector names, open shadow roots included. */

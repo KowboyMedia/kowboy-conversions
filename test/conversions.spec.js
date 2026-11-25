@@ -69,10 +69,24 @@ test('AC3: a form inside an open shadow root is counted', async ({ page }) => {
   expect(await events(page)).toEqual(['contact_form_start', 'contact_form_submit']);
 });
 
-test('AC4: Clarity is loaded with its ID and told no consent before anything else', async ({ page }) => {
-  await open(page, { body: form, settings: { clarity: 'abc123', forms: [] } });
-  expect(await page.locator('script[src="https://www.clarity.ms/tag/abc123"]').count()).toBe(1);
-  expect((await calls(page))[0]).toEqual(['consentv2', { ad_Storage: 'denied', analytics_Storage: 'denied' }]);
+test('AC4: Clarity is loaded only after the banner\'s yes, then told the consent', async ({ page }) => {
+  await open(page, { body: form, settings: { clarity: 'abc123', consent: 'cookieyes', forms: [] } });
+  const tag = page.locator('script[src="https://www.clarity.ms/tag/abc123"]');
+  expect(await tag.count()).toBe(0);
+  await page.evaluate(() =>
+    document.dispatchEvent(new CustomEvent('cookieyes_consent_update', { detail: { accepted: ['analytics'] } })),
+  );
+  expect(await tag.count()).toBe(1);
+  expect(await calls(page)).toEqual([['consentv2', { ad_Storage: 'denied', analytics_Storage: 'granted' }]]);
+});
+
+test('AC10: with a Clarity ID but no banner, Clarity is never loaded and the console says why', async ({ page }) => {
+  const warnings = [];
+  page.on('console', (m) => m.type() === 'warning' && warnings.push(m.text()));
+  await open(page, { body: form, settings: { clarity: 'abc123', forms: [{ name: 'valuation', form: '#lead' }] } });
+  await page.fill('[name=name]', 'A');
+  expect(await page.locator('script[src*="clarity.ms"]').count()).toBe(0);
+  expect(warnings.join()).toContain("Clarity needs the cookie banner's yes");
 });
 
 test('AC5: Cookiebot statistics consent becomes Clarity analytics consent', async ({ page }) => {

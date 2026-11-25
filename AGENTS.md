@@ -9,5 +9,5 @@ and submit in Microsoft Clarity. README.md says how a site installs it.
 - Design: none.
 - **This repository is public** (jsDelivr serves the script from it). Never write a client's
   name, address, Clarity ID or settings here: each site's settings live on that site.
-- Sites load the script by major version (`@1`). A change that breaks an existing site's settings
-  is a new major version, tagged `v2.0.0`; anything else is a new `v1.x.y` tag.
+- Sites load the script by major version (`@2`). A change that breaks an existing site's settings
+  is a new major version (`v3.0.0`); anything else is a new `v2.x.y` tag.

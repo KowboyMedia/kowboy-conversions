@@ -10,7 +10,7 @@ form steps, never what visitors type.
 ## Features
 
 1. Counts a form's open, start and submit as Clarity events, tagged with the page.
-2. Loads Clarity when the site does not, with consent denied until the site's banner grants it.
+2. Loads Clarity when the site does not, only after the site's cookie banner says yes to statistics.
 3. Reads Cookiebot's or CookieYes's answer and passes it to Clarity.
 
 ## Parts, data, technology, hosting
@@ -25,12 +25,13 @@ form steps, never what visitors type.
 1. Open, start and submit are counted for a form, each with its page.
 2. Start is counted once per filling, and again after a submit.
 3. A form inside an open shadow root is counted.
-4. Clarity is loaded with its ID and told no consent before anything else.
+4. Clarity is loaded only after the banner's yes, then told the consent.
 5. Cookiebot statistics consent becomes Clarity analytics consent.
 6. CookieYes analytics consent becomes Clarity analytics consent.
 7. Without settings nothing is counted and the console says why.
 8. Calls made before the site loads Clarity wait in its queue.
 9. A form with a wrong selector is skipped and named, the others still count.
+10. With a Clarity ID but no banner, Clarity is never loaded and the console says why.
 
 ## Out of scope
 
