@@ -138,3 +138,22 @@ test('AC9: a form with a wrong selector is skipped and named, the others still c
   expect(warnings.join()).toContain('"#lead[" is not a valid CSS selector');
   expect(await events(page)).toEqual(['valuation_form_start']);
 });
+
+test('AC11: WordPress consent (Complianz) statistics "allow" becomes Clarity analytics consent', async ({ page }) => {
+  await open(page, { body: '', before: recorder, settings: { consent: 'wpconsent', forms: [] } });
+  await page.evaluate(() => {
+    const detail = []; detail.statistics = 'allow';
+    document.dispatchEvent(new CustomEvent('wp_listen_for_consent_change', { detail }));
+  });
+  expect(await calls(page)).toEqual([['consentv2', { ad_Storage: 'denied', analytics_Storage: 'granted' }]]);
+});
+
+test('AC12: a stored WordPress consent "allow" counts at load, nothing else does', async ({ page }) => {
+  await page.context().addCookies([{ name: 'wp_consent_statistics', value: 'allow', url: 'https://site.test/' }]);
+  await open(page, {
+    body: '',
+    before: `${recorder} window.consent_api = { cookie_prefix: 'wp_consent' };`,
+    settings: { consent: 'wpconsent', forms: [] },
+  });
+  expect(await calls(page)).toEqual([['consentv2', { ad_Storage: 'denied', analytics_Storage: 'granted' }]]);
+});

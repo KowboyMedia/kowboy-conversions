@@ -66,13 +66,24 @@
         consent(!!(given.categories && given.categories.analytics));
       }
     },
+    // WordPress's consent standard (the plugin WP Consent API), which Complianz and others fill:
+    // only an explicit "allow" for statistics counts.
+    wpconsent: function () {
+      document.addEventListener('wp_listen_for_consent_change', function (event) {
+        var detail = event.detail || {};
+        if (detail.statistics) consent(detail.statistics === 'allow');
+      });
+      var prefix = window.consent_api && window.consent_api.cookie_prefix;
+      var stored = prefix && document.cookie.match(new RegExp('(?:^|; )' + prefix + '_statistics=([^;]*)'));
+      if (stored) consent(stored[1] === 'allow');
+    },
   };
   if (settings.consent && !banners[settings.consent]) {
-    console.warn('kowboy-conversions: consent "' + settings.consent + '" is unknown; use cookiebot or cookieyes.');
+    console.warn('kowboy-conversions: consent "' + settings.consent + '" is unknown; use cookiebot, cookieyes or wpconsent.');
   } else if (settings.consent) {
     banners[settings.consent]();
   } else if (settings.clarity) {
-    console.warn('kowboy-conversions: Clarity needs the cookie banner\'s yes; set consent to cookiebot or cookieyes.');
+    console.warn('kowboy-conversions: Clarity needs the cookie banner\'s yes; set consent to cookiebot, cookieyes or wpconsent.');
   }
 
   /** Whether the event passed through an element the selector names, open shadow roots included. */

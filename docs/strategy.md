@@ -11,7 +11,7 @@ form steps, never what visitors type.
 
 1. Counts a form's open, start and submit as Clarity events, tagged with the page.
 2. Loads Clarity when the site does not, only after the site's cookie banner says yes to statistics.
-3. Reads Cookiebot's or CookieYes's answer and passes it to Clarity.
+3. Reads Cookiebot's, CookieYes's or WordPress's consent standard's (Complianz) answer and passes it to Clarity.
 
 ## Parts, data, technology, hosting
 
@@ -32,6 +32,8 @@ form steps, never what visitors type.
 8. Calls made before the site loads Clarity wait in its queue.
 9. A form with a wrong selector is skipped and named, the others still count.
 10. With a Clarity ID but no banner, Clarity is never loaded and the console says why.
+11. WordPress consent (Complianz) statistics "allow" becomes Clarity analytics consent.
+12. A stored WordPress consent "allow" counts at load, nothing else does.
 
 ## Out of scope
 
