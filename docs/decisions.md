@@ -10,3 +10,5 @@ One line per structural decision: date, decision, who decided.
 - 2026-11-26 · `[conversions]` 2 a: Clarity, with its session recordings (sensitive text masked), is accepted for this measurement (Pavan, "Yes, all a", answering for Patric's task).
 - 2026-11-26 · `[conversions]` 4 a: a site without a cookie banner gets the free CookieYes plugin, which the script already reads. Rejected: b, leaving those sites out (Pavan).
 - 2026-11-26 · `[conversions]` 5 a: a form's submit step is proven by the first real visitors' sends seen in Clarity, never by a test send into a brokerage's CRM. Rejected: b, one test send per form (Pavan).
+- 2026-11-26 · `[conversions]` 6 a: on a site whose forms come from the old Kowboy plugin, the agent may read that plugin's served form script only to learn how a form confirms a send; nothing from it goes into Core (Pavan).
+- 2026-11-26 · `[conversions]` 7 a: a site with no code repository gets the script and its settings through the WPCode snippet plugin in WordPress. Rejected: b, editing theme files in WordPress's file editor (Pavan).
