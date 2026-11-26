@@ -157,3 +157,18 @@ test('AC12: a stored WordPress consent "allow" counts at load, nothing else does
   });
   expect(await calls(page)).toEqual([['consentv2', { ad_Storage: 'denied', analytics_Storage: 'granted' }]]);
 });
+
+test('AC13: a confirmation inside the form\'s shadow root counts, one outside it does not', async ({ page }) => {
+  await open(page, {
+    body: '<div id="host"></div><p class="done" hidden>Tack</p>',
+    before: `${recorder} document.querySelector('#host').attachShadow({ mode: 'open' }).innerHTML = '<form id="inner"><input name="name"></form>';`,
+    settings: { forms: [{ name: 'valuation', form: '#host', submit: { shown: '.done' } }] },
+  });
+  await page.locator('#host input').fill('A');
+  await page.evaluate(() => { document.querySelector('p.done').hidden = false; });
+  await page.evaluate(() => {
+    const p = document.createElement('p'); p.className = 'done'; p.textContent = 'Tack';
+    document.querySelector('#host').shadowRoot.appendChild(p);
+  });
+  await expect.poll(() => events(page)).toEqual(['valuation_form_start', 'valuation_form_submit']);
+});

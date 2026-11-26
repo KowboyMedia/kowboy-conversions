@@ -34,6 +34,7 @@ form steps, never what visitors type.
 10. With a Clarity ID but no banner, Clarity is never loaded and the console says why.
 11. WordPress consent (Complianz) statistics "allow" becomes Clarity analytics consent.
 12. A stored WordPress consent "allow" counts at load, nothing else does.
+13. A confirmation inside the form's shadow root counts, one outside it does not.
 
 ## Out of scope
 

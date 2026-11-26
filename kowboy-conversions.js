@@ -113,9 +113,25 @@
         if (within(event, form.open)) track(form.name, 'open');
       }, true);
     }
+    // The confirmation the site shows, watched in the form's own part of the page (the document,
+    // or the open shadow root the form sits in) from the visitor's first input on.
+    var watched = [];
+    function watch(root) {
+      if (!form.submit || !form.submit.shown || watched.indexOf(root) > -1) return;
+      watched.push(root);
+      var shown = false;
+      new MutationObserver(function () {
+        var element = root.querySelector(form.submit.shown);
+        var now = !!(element && element.getClientRects().length);
+        if (now && !shown) submitted();
+        shown = now;
+      }).observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'style', 'hidden'] });
+    }
     // The first thing typed or ticked; counted again after a submit, for the next one.
     window.addEventListener('input', function (event) {
-      if (started || !within(event, form.form)) return;
+      if (!within(event, form.form)) return;
+      watch(event.composedPath()[0].getRootNode());
+      if (started) return;
       started = true;
       track(form.name, 'start');
     }, true);
@@ -127,21 +143,6 @@
       window.addEventListener(form.submit.event, function (event) {
         if (within(event, form.form)) submitted();
       }, true);
-    }
-    if (form.submit && form.submit.shown) {
-      // A confirmation the site shows: counted each time it becomes visible.
-      var shown = false;
-      new MutationObserver(function () {
-        var element = document.querySelector(form.submit.shown);
-        var now = !!(element && element.getClientRects().length);
-        if (now && !shown) submitted();
-        shown = now;
-      }).observe(document.documentElement, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class', 'style', 'hidden'],
-      });
     }
   });
 })();

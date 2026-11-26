@@ -31,7 +31,8 @@ Before `</head>` (or as one Custom HTML tag in the site's Tag Manager):
 
 - `form`: a CSS selector for the form (inside an open shadow root works too).
 - `submit`: either `event`, a DOM event the site fires on success (Contact Form 7: `wpcf7mailsent`),
-  or `shown`, a selector for the confirmation that becomes visible.
+  or `shown`, a selector for the confirmation that becomes visible, looked for in the form's own
+  part of the page (the document, or the open shadow root the form sits in) after the first input.
 - The script sets no cookies and sends nothing itself. Clarity is loaded only after the site's
   cookie banner gets the visitor's yes to statistics: tracking by script needs consent even
   without cookies (EDPB guidelines 2/2023, 2024). A site without a banner gets no Clarity.
