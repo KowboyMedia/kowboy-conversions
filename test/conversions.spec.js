@@ -172,3 +172,40 @@ test('AC13: a confirmation inside the form\'s shadow root counts, one outside it
   });
   await expect.poll(() => events(page)).toEqual(['valuation_form_start', 'valuation_form_submit']);
 });
+
+test('AC14: the older CookieYes banner gives a yes only after "Accept all" sets its cookies', async ({ page }) => {
+  await open(page, {
+    body: '<div id="cookie-law-info-bar"><a id="accept">Godkänn</a><a id="reject">Neka</a></div>',
+    before: recorder,
+    settings: { consent: 'cookielawinfo', forms: [] },
+  });
+  await page.evaluate(() => {
+    document.querySelector('#reject').addEventListener('click', () => {
+      document.cookie = 'viewed_cookie_policy=no; path=/';
+      document.cookie = 'cookielawinfo-checkbox-non-necessary=no; path=/';
+    });
+    document.querySelector('#accept').addEventListener('click', () => {
+      document.cookie = 'viewed_cookie_policy=yes; path=/';
+      document.cookie = 'cookielawinfo-checkbox-non-necessary=yes; path=/';
+    });
+  });
+  await page.click('#reject');
+  await page.waitForTimeout(200);
+  await page.click('#accept');
+  await expect.poll(() => calls(page)).toEqual([
+    ['consentv2', { ad_Storage: 'denied', analytics_Storage: 'denied' }],
+    ['consentv2', { ad_Storage: 'denied', analytics_Storage: 'granted' }],
+  ]);
+});
+
+test('AC15: a stored older-banner yes counts at load; no answer yet counts as nothing', async ({ page }) => {
+  await page.context().addCookies([
+    { name: 'viewed_cookie_policy', value: 'yes', url: 'https://site.test/' },
+    { name: 'cookielawinfo-checkbox-non-necessary', value: 'yes', url: 'https://site.test/' },
+  ]);
+  await open(page, { body: '', before: recorder, settings: { consent: 'cookielawinfo', forms: [] } });
+  expect(await calls(page)).toEqual([['consentv2', { ad_Storage: 'denied', analytics_Storage: 'granted' }]]);
+  await page.context().clearCookies();
+  await open(page, { body: '', before: recorder, settings: { consent: 'cookielawinfo', forms: [] } });
+  expect(await calls(page)).toEqual([]);
+});

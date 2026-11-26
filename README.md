@@ -19,7 +19,7 @@ Before `</head>` (or as one Custom HTML tag in the site's Tag Manager):
 <script data-cookieconsent="ignore">
   window.kowboyConversions = {
     clarity: 'PROJECT_ID', // leave out when the site already loads Clarity
-    consent: 'cookiebot', // or 'cookieyes', or 'wpconsent' (Complianz and others): Clarity loads only after a yes to statistics
+    consent: 'cookiebot', // or 'cookieyes', 'cookielawinfo' (CookieYes's older banner), or 'wpconsent' (Complianz and others): Clarity loads only after a yes to statistics
     forms: [
       { name: 'valuation', open: '.valuation-button', form: '#valuation-form', submit: { event: 'wpcf7mailsent' } },
       { name: 'contact', form: '#contact-form', submit: { shown: '.contact-thanks' } },

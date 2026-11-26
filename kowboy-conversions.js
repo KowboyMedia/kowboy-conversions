@@ -66,6 +66,19 @@
         consent(!!(given.categories && given.categories.analytics));
       }
     },
+    // The older banner of the same CookieYes plugin ("legacy" mode): no event, so its two cookies
+    // are read at load and again just after any click on the banner. Only "Accept all" (or the
+    // non-necessary switch) gives a yes; a page view alone never does.
+    cookielawinfo: function () {
+      function read() {
+        var viewed = /(?:^|; )viewed_cookie_policy=yes/.test(document.cookie);
+        consent(viewed && /(?:^|; )cookielawinfo-checkbox-non-necessary=yes/.test(document.cookie));
+      }
+      document.addEventListener('click', function (event) {
+        if (within(event, '#cookie-law-info-bar, #cliSettingsPopup')) setTimeout(read, 100);
+      }, true);
+      if (/(?:^|; )viewed_cookie_policy=/.test(document.cookie)) read();
+    },
     // WordPress's consent standard (the plugin WP Consent API), which Complianz and others fill:
     // only an explicit "allow" for statistics counts.
     wpconsent: function () {
@@ -79,11 +92,11 @@
     },
   };
   if (settings.consent && !banners[settings.consent]) {
-    console.warn('kowboy-conversions: consent "' + settings.consent + '" is unknown; use cookiebot, cookieyes or wpconsent.');
+    console.warn('kowboy-conversions: consent "' + settings.consent + '" is unknown; use cookiebot, cookieyes, cookielawinfo or wpconsent.');
   } else if (settings.consent) {
     banners[settings.consent]();
   } else if (settings.clarity) {
-    console.warn('kowboy-conversions: Clarity needs the cookie banner\'s yes; set consent to cookiebot, cookieyes or wpconsent.');
+    console.warn('kowboy-conversions: Clarity needs the cookie banner\'s yes; set consent to cookiebot, cookieyes, cookielawinfo or wpconsent.');
   }
 
   /** Whether the event passed through an element the selector names, open shadow roots included. */

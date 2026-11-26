@@ -11,7 +11,7 @@ form steps, never what visitors type.
 
 1. Counts a form's open, start and submit as Clarity events, tagged with the page.
 2. Loads Clarity when the site does not, only after the site's cookie banner says yes to statistics.
-3. Reads Cookiebot's, CookieYes's or WordPress's consent standard's (Complianz) answer and passes it to Clarity.
+3. Reads Cookiebot's, CookieYes's (new or older banner) or WordPress's consent standard's (Complianz) answer and passes it to Clarity.
 
 ## Parts, data, technology, hosting
 
@@ -35,6 +35,8 @@ form steps, never what visitors type.
 11. WordPress consent (Complianz) statistics "allow" becomes Clarity analytics consent.
 12. A stored WordPress consent "allow" counts at load, nothing else does.
 13. A confirmation inside the form's shadow root counts, one outside it does not.
+14. The older CookieYes banner gives a yes only after "Accept all" sets its cookies.
+15. A stored older-banner yes counts at load; no answer yet counts as nothing.
 
 ## Out of scope
 
